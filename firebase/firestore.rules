@@ -1,0 +1,68 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function userDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function isAdmin() {
+      return isSignedIn()
+        && userDoc().exists
+        && userDoc().data.role == 'admin';
+    }
+
+    function isValidOrderCreate() {
+      return request.resource.data.userId == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.paymentStatus == 'verification_pending'
+        && request.resource.data.paymentMethod == 'qr_upi'
+        && request.resource.data.customerName is string
+        && request.resource.data.customerPhone is string;
+    }
+
+    function isValidUtrSubmit() {
+      return isSignedIn()
+        && resource.data.userId == request.auth.uid
+        && resource.data.paymentStatus == 'verification_pending'
+        && request.resource.data.paymentStatus == 'verification_pending'
+        && request.resource.data.upiTransactionId is string
+        && request.resource.data.upiTransactionId.size() >= 6
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upiTransactionId']);
+    }
+
+    match /products/{productId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /users/{userId} {
+      allow read: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow update: if isSignedIn() && request.auth.uid == userId;
+      allow delete: if false;
+    }
+
+    match /orders/{orderId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && isValidOrderCreate();
+      allow update: if isAdmin() || isValidUtrSubmit();
+      allow delete: if false;
+    }
+
+    match /returnRequests/{requestId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}
