@@ -1,4 +1,6 @@
 import { getCloudinaryConfig, isCloudinaryConfigured } from '@/config/env'
+import { storage } from '@/config/firebase'
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 
 interface CloudinaryUploadResponse {
   secure_url: string
@@ -6,7 +8,20 @@ interface CloudinaryUploadResponse {
 }
 
 export function isCloudinaryReady(): boolean {
-  return isCloudinaryConfigured()
+  // We return true now because we have a fallback (Firebase Storage), 
+  // so the upload component can always render the upload controls.
+  return true
+}
+
+export async function uploadImageToFirebase(file: File): Promise<string> {
+  const fileExtension = file.name.split('.').pop()
+  const randomId = Math.random().toString(36).substring(2, 8)
+  const fileName = `products/${Date.now()}_${randomId}.${fileExtension}`
+  
+  const storageRef = ref(storage, fileName)
+  const snapshot = await uploadBytes(storageRef, file)
+  const downloadUrl = await getDownloadURL(snapshot.ref)
+  return downloadUrl
 }
 
 export async function uploadImageToCloudinary(file: File): Promise<string> {
@@ -41,6 +56,15 @@ export async function uploadImageToCloudinary(file: File): Promise<string> {
 }
 
 export async function uploadImagesToCloudinary(files: File[]): Promise<string[]> {
-  const uploads = files.map((file) => uploadImageToCloudinary(file))
+  const useCloudinary = isCloudinaryConfigured()
+  
+  const uploads = files.map(async (file) => {
+    if (useCloudinary) {
+      return uploadImageToCloudinary(file)
+    } else {
+      return uploadImageToFirebase(file)
+    }
+  })
+  
   return Promise.all(uploads)
 }
