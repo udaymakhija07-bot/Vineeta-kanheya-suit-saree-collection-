@@ -29,10 +29,10 @@ const emptyForm: ProductInput = {
   tags: [],
 }
 
-import { useAuth } from '@/hooks/useAuth'
+
 
 export default function ProductForm({ product, mode }: ProductFormProps) {
-  const { user, profile } = useAuth()
+
   const navigate = useNavigate()
   const [form, setForm] = useState<ProductInput>(
     product
