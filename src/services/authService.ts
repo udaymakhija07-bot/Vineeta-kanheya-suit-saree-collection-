@@ -44,9 +44,41 @@ export async function logoutUser(): Promise<void> {
 }
 
 export async function getUserProfile(uid: string): Promise<UserProfile | null> {
+  const currentUser = auth.currentUser
   const snapshot = await getDoc(doc(db, 'users', uid))
-  if (!snapshot.exists()) return null
-  return snapshot.data() as UserProfile
+  
+  if (!snapshot.exists()) {
+    if (currentUser?.email && isAdminEmail(currentUser.email)) {
+      const newProfile: UserProfile = {
+        uid,
+        email: currentUser.email,
+        displayName: currentUser.displayName || 'Admin',
+        role: 'admin',
+        addresses: [],
+        createdAt: new Date().toISOString(),
+      }
+      try {
+        await setDoc(doc(db, 'users', uid), newProfile)
+        return newProfile
+      } catch (e) {
+        console.error('Failed to create admin profile in Firestore:', e)
+      }
+    }
+    return null
+  }
+  
+  const profile = snapshot.data() as UserProfile
+
+  if (profile.email && isAdminEmail(profile.email) && profile.role !== 'admin') {
+    profile.role = 'admin'
+    try {
+      await setDoc(doc(db, 'users', uid), { role: 'admin' }, { merge: true })
+    } catch (e) {
+      console.error('Failed to auto-promote admin profile in Firestore:', e)
+    }
+  }
+
+  return profile
 }
 
 export function isUserAdmin(profile: UserProfile | null, email?: string | null): boolean {

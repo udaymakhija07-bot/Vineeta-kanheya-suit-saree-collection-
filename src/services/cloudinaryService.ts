@@ -13,15 +13,38 @@ export function isCloudinaryReady(): boolean {
   return true
 }
 
+export function withTimeout<T>(promise: Promise<T>, ms: number, errorMessage: string): Promise<T> {
+  let timeoutId: any
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(new Error(errorMessage))
+    }, ms)
+  })
+  
+  return Promise.race([promise, timeoutPromise]).finally(() => {
+    clearTimeout(timeoutId)
+  })
+}
+
 export async function uploadImageToFirebase(file: File): Promise<string> {
   const fileExtension = file.name.split('.').pop()
   const randomId = Math.random().toString(36).substring(2, 8)
   const fileName = `products/${Date.now()}_${randomId}.${fileExtension}`
   
   const storageRef = ref(storage, fileName)
-  const snapshot = await uploadBytes(storageRef, file)
-  const downloadUrl = await getDownloadURL(snapshot.ref)
-  return downloadUrl
+  
+  const uploadPromise = (async () => {
+    const snapshot = await uploadBytes(storageRef, file)
+    const downloadUrl = await getDownloadURL(snapshot.ref)
+    return downloadUrl
+  })()
+
+  // 12 seconds timeout to prevent hanging UI
+  return withTimeout(
+    uploadPromise,
+    12000,
+    'Firebase Storage upload timed out. Please ensure Firebase Storage is enabled in your Firebase Console, or try pasting the image URL directly.'
+  )
 }
 
 export async function uploadImageToCloudinary(file: File): Promise<string> {
@@ -56,15 +79,6 @@ export async function uploadImageToCloudinary(file: File): Promise<string> {
 }
 
 export async function uploadImagesToCloudinary(files: File[]): Promise<string[]> {
-  const useCloudinary = isCloudinaryConfigured()
-  
-  const uploads = files.map(async (file) => {
-    if (useCloudinary) {
-      return uploadImageToCloudinary(file)
-    } else {
-      return uploadImageToFirebase(file)
-    }
-  })
-  
+  const uploads = files.map((file) => uploadImageToCloudinary(file))
   return Promise.all(uploads)
 }

@@ -29,7 +29,10 @@ const emptyForm: ProductInput = {
   tags: [],
 }
 
+import { useAuth } from '@/hooks/useAuth'
+
 export default function ProductForm({ product, mode }: ProductFormProps) {
+  const { user, profile } = useAuth()
   const navigate = useNavigate()
   const [form, setForm] = useState<ProductInput>(
     product
@@ -110,6 +113,14 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Diagnostic Info Box */}
+      <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-xs text-blue-900 space-y-1">
+        <p className="font-semibold">🔍 Diagnostic Info (For Debugging):</p>
+        <p>Logged in Email: <strong className="underline">{user?.email || 'Not logged in'}</strong></p>
+        <p>Auth UID: <code>{user?.uid || 'N/A'}</code></p>
+        <p>Role in Database Profile: <strong className="uppercase">{profile?.role || 'N/A'}</strong></p>
+      </div>
+
       {error && (
         <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}

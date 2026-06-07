@@ -21,74 +21,21 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-40 border-b border-gray-200 bg-white/95 backdrop-blur">
-      <div className="border-b border-brand-gold/30 bg-brand-maroon text-white">
-        <div className="container-app py-2 text-center text-xs sm:text-sm">
-          Free delivery on orders above ₹999 · Authentic ethnic wear
+    <>
+      <header className="sticky top-0 z-40 border-b border-gray-200 bg-white/95 backdrop-blur">
+        <div className="border-b border-brand-gold/30 bg-brand-maroon text-white">
+          <div className="container-app py-2 text-center text-xs sm:text-sm">
+            Free delivery on orders above ₹999 · Authentic ethnic wear
+          </div>
         </div>
-      </div>
 
-      <div className="container-app flex h-16 items-center justify-between gap-4">
-        {/* Mobile Hamburger Menu (visible only on mobile/tablet) */}
-        <button
-          type="button"
-          onClick={() => setIsMobileMenuOpen(true)}
-          className="rounded-md p-2 text-brand-charcoal hover:bg-brand-cream lg:hidden"
-          aria-label="Open navigation menu"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="h-6 w-6"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-          </svg>
-        </button>
-
-        <Link to="/" className="min-w-0 flex-1 lg:flex-none">
-          <p className="font-display text-lg font-semibold text-brand-maroon sm:text-xl truncate">
-            {APP_NAME}
-          </p>
-        </Link>
-
-        <nav className="hidden items-center gap-6 lg:flex">
-          {navLinks.map((link) => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              className={({ isActive }) =>
-                `text-sm font-medium transition hover:text-brand-maroon ${
-                  isActive ? 'text-brand-maroon' : 'text-brand-charcoal'
-                }`
-              }
-            >
-              {link.label}
-            </NavLink>
-          ))}
-        </nav>
-
-        <div className="flex items-center gap-2 sm:gap-3">
-          {isAdmin && (
-            <Link
-              to="/admin"
-              className="hidden text-sm font-medium text-brand-maroon hover:underline sm:inline"
-            >
-              Admin
-            </Link>
-          )}
-          <Link
-            to={user ? '/account' : '/login'}
-            className="hidden text-sm font-medium text-brand-charcoal hover:text-brand-maroon sm:inline"
-          >
-            {user ? 'Account' : 'Login'}
-          </Link>
-          <Link
-            to="/cart"
-            className="relative rounded-md p-2 text-brand-charcoal hover:bg-brand-cream"
-            aria-label="Shopping cart"
+        <div className="container-app flex h-16 items-center justify-between gap-4">
+          {/* Mobile Hamburger Menu (visible only on mobile/tablet) */}
+          <button
+            type="button"
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="rounded-md p-2 text-brand-charcoal hover:bg-brand-cream lg:hidden"
+            aria-label="Open navigation menu"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -98,22 +45,77 @@ export default function Header() {
               stroke="currentColor"
               className="h-6 w-6"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
             </svg>
-            {itemCount > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-brand-maroon text-xs font-bold text-white">
-                {itemCount}
-              </span>
-            )}
-          </Link>
-        </div>
-      </div>
+          </button>
 
-      {/* Mobile Drawer (Slide-out menu) */}
+          <Link to="/" className="min-w-0 flex-1 lg:flex-none">
+            <p className="font-display text-lg font-semibold text-brand-maroon sm:text-xl truncate">
+              {APP_NAME}
+            </p>
+          </Link>
+
+          <nav className="hidden items-center gap-6 lg:flex">
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                className={({ isActive }) =>
+                  `text-sm font-medium transition hover:text-brand-maroon ${
+                    isActive ? 'text-brand-maroon' : 'text-brand-charcoal'
+                  }`
+                }
+              >
+                {link.label}
+              </NavLink>
+            ))}
+          </nav>
+
+          <div className="flex items-center gap-2 sm:gap-3">
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className="hidden text-sm font-medium text-brand-maroon hover:underline sm:inline"
+              >
+                Admin
+            </Link>
+            )}
+            <Link
+              to={user ? '/account' : '/login'}
+              className="hidden text-sm font-medium text-brand-charcoal hover:text-brand-maroon sm:inline"
+            >
+              {user ? 'Account' : 'Login'}
+            </Link>
+            <Link
+              to="/cart"
+              className="relative rounded-md p-2 text-brand-charcoal hover:bg-brand-cream"
+              aria-label="Shopping cart"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="h-6 w-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                />
+              </svg>
+              {itemCount > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-brand-maroon text-xs font-bold text-white">
+                  {itemCount}
+                </span>
+              )}
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      {/* Mobile Drawer (Slide-out menu, rendered outside the <header> to avoid backdrop-blur clipping context) */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           {/* Backdrop overlay */}
@@ -125,7 +127,7 @@ export default function Header() {
           />
 
           {/* Drawer Content */}
-          <aside className="fixed inset-y-0 left-0 flex w-72 max-w-xs flex-col bg-white shadow-xl transition-transform duration-300 ease-in-out">
+          <aside className="fixed inset-y-0 left-0 flex w-72 max-w-xs flex-col bg-white shadow-xl transition-transform duration-300 ease-in-out z-50">
             <div className="flex h-16 items-center justify-between border-b border-gray-100 px-6 bg-brand-maroon text-white">
               <span className="font-display font-semibold tracking-wide">{APP_NAME}</span>
               <button
@@ -206,6 +208,6 @@ export default function Header() {
           </aside>
         </div>
       )}
-    </header>
+    </>
   )
 }

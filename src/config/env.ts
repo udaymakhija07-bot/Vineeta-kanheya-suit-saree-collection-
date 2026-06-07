@@ -102,6 +102,7 @@ export function isAdminEmail(email: string): boolean {
     readEnv('VITE_ADMIN_EMAIL').toLowerCase(),
     'tusharmakhija@gmail.com',
     'udaymakhija07@gmail.com',
+    'udayprakashmakija@gmail.com',
   ].filter(Boolean)
 
   return adminEmails.includes(normalized)
