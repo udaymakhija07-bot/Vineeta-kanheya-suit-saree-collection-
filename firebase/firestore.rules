@@ -11,8 +11,11 @@ service cloud.firestore {
 
     function isAdmin() {
       return isSignedIn()
-        && userDoc().exists
-        && userDoc().data.role == 'admin';
+        && (
+          (userDoc().exists && userDoc().data.role == 'admin')
+          || request.auth.token.email == 'udayprakashmakija@gmail.com'
+          || request.auth.token.email == 'udaymakhija07@gmail.com'
+        );
     }
 
     function isValidOrderCreate() {
